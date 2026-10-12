@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Information Form</title>
+</head>
+
+<body>
+
+<h2>Student Information Form</h2>
+
+<form id="studentForm">
+
+    Name:
+    <input type="text" id="name" required>
+    <br><br>
+
+    Age:
+    <input type="number" id="age" required>
+    <br><br>
+
+    Gender:
+    <input type="radio" name="gender" value="Male"> Male
+    <input type="radio" name="gender" value="Female"> Female
+    <br><br>
+
+    Hobbies:
+    <input type="checkbox" name="hobby" value="Reading"> Reading
+    <input type="checkbox" name="hobby" value="Playing"> Playing
+    <input type="checkbox" name="hobby" value="Music"> Music
+    <br><br>
+
+    Department:
+    <select id="department">
+        <option value="CSE">CSE</option>
+        <option value="ECE">ECE</option>
+        <option value="EEE">EEE</option>
+        <option value="MECH">MECH</option>
+        <option value="CIVIL">CIVIL</option>
+    </select>
+    <br><br>
+
+    <input type="submit" value="Submit">
+
+</form>
+
+<br>
+
+<h2>Stored Student Details</h2>
+
+<table border="1" cellpadding="10">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Gender</th>
+            <th>Hobbies</th>
+            <th>Department</th>
+        </tr>
+    </thead>
+
+    <tbody id="studentTable">
+    </tbody>
+</table>
+
+<script>
+
+document.getElementById("studentForm").onsubmit = function(event) {
+
+    event.preventDefault();
+
+    let name = document.getElementById("name").value;
+    let age = document.getElementById("age").value;
+
+    let gender = document.querySelector(
+        'input[name="gender"]:checked'
+    ).value;
+
+    let hobbies = [];
+
+    document.querySelectorAll(
+        'input[name="hobby"]:checked'
+    ).forEach(function(item) {
+        hobbies.push(item.value);
+    });
+
+    let department =
+        document.getElementById("department").value;
+
+    let table =
+        document.getElementById("studentTable");
+
+    let row = table.insertRow();
+
+    row.insertCell(0).innerHTML = name;
+    row.insertCell(1).innerHTML = age;
+    row.insertCell(2).innerHTML = gender;
+    row.insertCell(3).innerHTML = hobbies.join(", ");
+    row.insertCell(4).innerHTML = department;
+
+    document.getElementById("studentForm").reset();
+};
+
+</script>
+
+</body>
+</html>
