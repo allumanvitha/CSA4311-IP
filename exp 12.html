@@ -1,0 +1,406 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beauty Parlour Appointment Booking</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #fff0f5;
+            color: #333;
+        }
+
+        header {
+            background: #c2185b;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        nav {
+            background: #880e4f;
+            padding: 12px;
+            text-align: center;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 12px;
+        }
+
+        section {
+            padding: 20px;
+        }
+
+        .services {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .service {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            width: 200px;
+            box-shadow: 0 2px 6px #ddd;
+        }
+
+        input, select, textarea {
+            display: block;
+            width: 95%;
+            max-width: 450px;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: #c2185b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .panel {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Glamour Beauty Parlour</h1>
+    <p>Book Your Beauty Appointment Online</p>
+</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#services">Services</a>
+    <a href="#booking">Book Appointment</a>
+    <a href="#myappointments">My Appointments</a>
+    <a href="#admin">Admin</a>
+    <a href="#feedback">Feedback</a>
+</nav>
+
+<section id="home">
+    <h2>Welcome to Glamour Beauty Parlour</h2>
+    <p>Choose your preferred beauty service, stylist, date,
+       and time to book an appointment.</p>
+</section>
+
+<section id="services">
+    <h2>Our Beauty Services</h2>
+    <div class="services">
+        <div class="service">
+            <h3>Haircut</h3>
+            <p>Price: ₹300</p>
+            <p>Professional haircut and styling.</p>
+        </div>
+
+        <div class="service">
+            <h3>Facial</h3>
+            <p>Price: ₹800</p>
+            <p>Skin cleansing and facial treatment.</p>
+        </div>
+
+        <div class="service">
+            <h3>Bridal Makeup</h3>
+            <p>Price: ₹5000</p>
+            <p>Makeup for weddings and special events.</p>
+        </div>
+
+        <div class="service">
+            <h3>Manicure</h3>
+            <p>Price: ₹400</p>
+            <p>Nail care and hand treatment.</p>
+        </div>
+    </div>
+</section>
+
+<section id="booking">
+    <h2>Book an Appointment</h2>
+
+    <form id="bookingForm" onsubmit="bookAppointment(event)">
+        <input type="text" id="customerName"
+               placeholder="Customer Name" required>
+
+        <input type="email" id="email"
+               placeholder="Email Address" required>
+
+        <input type="tel" id="phone"
+               placeholder="10-digit Phone Number"
+               pattern="[0-9]{10}" required>
+
+        <label>Select Service</label>
+        <select id="service" required>
+            <option value="">Choose a service</option>
+            <option value="Haircut" data-price="300">
+                Haircut - ₹300
+            </option>
+            <option value="Facial" data-price="800">
+                Facial - ₹800
+            </option>
+            <option value="Bridal Makeup" data-price="5000">
+                Bridal Makeup - ₹5000
+            </option>
+            <option value="Manicure" data-price="400">
+                Manicure - ₹400
+            </option>
+        </select>
+
+        <label>Select Stylist</label>
+        <select id="stylist" required>
+            <option value="">Choose a stylist</option>
+            <option value="Priya">Priya</option>
+            <option value="Anitha">Anitha</option>
+            <option value="Kavya">Kavya</option>
+        </select>
+
+        <label>Appointment Date</label>
+        <input type="date" id="date" required>
+
+        <label>Appointment Time</label>
+        <select id="time" required>
+            <option value="">Choose a time</option>
+            <option value="10:00 AM">10:00 AM</option>
+            <option value="11:00 AM">11:00 AM</option>
+            <option value="12:00 PM">12:00 PM</option>
+            <option value="02:00 PM">02:00 PM</option>
+            <option value="03:00 PM">03:00 PM</option>
+            <option value="04:00 PM">04:00 PM</option>
+        </select>
+
+        <label>Payment Preference</label>
+        <select id="payment" required>
+            <option value="Pay at Parlour">Pay at Parlour</option>
+            <option value="Full Payment">Full Payment</option>
+            <option value="Partial Deposit">Partial Deposit</option>
+        </select>
+
+        <button type="submit">Book Appointment</button>
+    </form>
+
+    <div class="panel" id="confirmation" aria-live="polite"></div>
+</section>
+
+<section id="myappointments">
+    <h2>My Appointments</h2>
+    <div id="appointmentList" class="panel">
+        No appointments booked.
+    </div>
+</section>
+
+<section id="admin">
+    <h2>Admin Panel</h2>
+    <p>View appointments and manage reservation status.</p>
+
+    <div id="adminList" class="panel">
+        No appointments available.
+    </div>
+</section>
+
+<section id="feedback">
+    <h2>Customer Feedback</h2>
+
+    <form onsubmit="submitFeedback(event)">
+        <input type="text" id="feedbackName"
+               placeholder="Your Name" required>
+
+        <label>Rating</label>
+        <select id="rating" required>
+            <option value="">Select rating</option>
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Very Good</option>
+            <option value="3">3 - Good</option>
+            <option value="2">2 - Fair</option>
+            <option value="1">1 - Poor</option>
+        </select>
+
+        <textarea id="comments"
+                  placeholder="Write your feedback"
+                  required></textarea>
+
+        <button type="submit">Submit Feedback</button>
+    </form>
+
+    <div id="feedbackList" class="panel"></div>
+</section>
+
+<script>
+    let appointments = [];
+    let feedbacks = [];
+    let nextId = 1;
+
+    // Prevent booking dates in the past.
+    const dateInput = document.getElementById("date");
+    const today = new Date();
+    const localToday = [
+        today.getFullYear(),
+        String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0")
+    ].join("-");
+
+    dateInput.min = localToday;
+
+    function bookAppointment(event) {
+        event.preventDefault();
+
+        const name =
+            document.getElementById("customerName").value;
+        const email =
+            document.getElementById("email").value;
+        const phone =
+            document.getElementById("phone").value;
+        const service =
+            document.getElementById("service").value;
+        const stylist =
+            document.getElementById("stylist").value;
+        const date =
+            document.getElementById("date").value;
+        const time =
+            document.getElementById("time").value;
+        const payment =
+            document.getElementById("payment").value;
+
+        if (date < localToday) {
+            alert("Please choose today or a future date.");
+            return;
+        }
+
+        // Prevent duplicate active bookings for the same stylist.
+        const alreadyBooked = appointments.some(a =>
+            a.stylist === stylist &&
+            a.date === date &&
+            a.time === time &&
+            a.status === "Booked"
+        );
+
+        if (alreadyBooked) {
+            alert("This stylist's selected slot is unavailable.");
+            return;
+        }
+
+        const selectedOption =
+            document.getElementById("service")
+                .selectedOptions[0];
+        const price = Number(selectedOption.dataset.price);
+
+        const appointment = {
+            id: nextId++,
+            name, email, phone, service, stylist,
+            date, time, payment, price,
+            status: "Booked"
+        };
+
+        appointments.push(appointment);
+
+        document.getElementById("confirmation").textContent =
+            "Appointment #" + appointment.id +
+            " booked successfully for " + name +
+            ". Service: " + service +
+            ". Stylist: " + stylist +
+            ". Price: ₹" + price +
+            ". Payment: " + payment + ".";
+
+        document.getElementById("bookingForm").reset();
+        renderAppointments();
+    }
+
+    function renderAppointments() {
+        const customerList =
+            document.getElementById("appointmentList");
+        const adminList =
+            document.getElementById("adminList");
+
+        if (appointments.length === 0) {
+            customerList.textContent = "No appointments booked.";
+            adminList.textContent = "No appointments available.";
+            return;
+        }
+
+        customerList.replaceChildren();
+        adminList.replaceChildren();
+
+        appointments.forEach(a => {
+            const customerItem = document.createElement("div");
+            customerItem.className = "panel";
+            customerItem.textContent =
+                "#" + a.id + " | " + a.service +
+                " | " + a.date + " at " + a.time +
+                " | Stylist: " + a.stylist +
+                " | Status: " + a.status;
+
+            if (a.status === "Booked") {
+                const cancel = document.createElement("button");
+                cancel.textContent = "Cancel Appointment";
+                cancel.onclick = () => {
+                    a.status = "Cancelled";
+                    renderAppointments();
+                };
+                customerItem.appendChild(cancel);
+            }
+
+            customerList.appendChild(customerItem);
+
+            const adminItem = document.createElement("div");
+            adminItem.className = "panel";
+            adminItem.textContent =
+                "#" + a.id + " | " + a.name +
+                " | " + a.phone + " | " + a.service +
+                " | " + a.date + " " + a.time +
+                " | " + a.status;
+
+            const statusSelect = document.createElement("select");
+            ["Booked", "Completed", "Cancelled"].forEach(status => {
+                const option = document.createElement("option");
+                option.value = status;
+                option.textContent = status;
+                statusSelect.appendChild(option);
+            });
+            statusSelect.value = a.status;
+            statusSelect.onchange = () => {
+                a.status = statusSelect.value;
+                renderAppointments();
+            };
+
+            adminItem.appendChild(statusSelect);
+            adminList.appendChild(adminItem);
+        });
+    }
+
+    function submitFeedback(event) {
+        event.preventDefault();
+
+        const name =
+            document.getElementById("feedbackName").value;
+        const rating =
+            document.getElementById("rating").value;
+        const comments =
+            document.getElementById("comments").value;
+
+        feedbacks.push({ name, rating, comments });
+
+        const item = document.createElement("p");
+        item.textContent =
+            name + " | Rating: " + rating + "/5 | " + comments;
+
+        document.getElementById("feedbackList").appendChild(item);
+        event.target.reset();
+        alert("Thank you for your feedback!");
+    }
+</script>
+
+</body>
+</html>
