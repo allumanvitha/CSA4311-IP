@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Flight Reservation System</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background-color: lightblue;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: navy;
+            color: white;
+            padding: 15px;
+        }
+
+        .box {
+            background-color: white;
+            width: 350px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin: 8px;
+        }
+
+        button {
+            background-color: navy;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>Online Flight Reservation System</h1>
+
+<div class="box">
+    <h2>Search Flight</h2>
+
+    <input type="text" id="source" placeholder="From">
+    <input type="text" id="destination" placeholder="To">
+    <input type="date" id="date">
+
+    <select id="classType">
+        <option>Economy</option>
+        <option>Business</option>
+        <option>First Class</option>
+    </select>
+
+    <button onclick="searchFlight()">Search Flight</button>
+    <p id="searchResult"></p>
+</div>
+
+<div class="box">
+    <h2>Book Ticket</h2>
+
+    <input type="text" id="name" placeholder="Passenger Name">
+    <input type="number" id="age" placeholder="Passenger Age">
+
+    <button onclick="bookTicket()">Book Ticket</button>
+    <p id="bookingResult"></p>
+</div>
+
+<div class="box">
+    <h2>View Booking Status</h2>
+
+    <input type="number" id="pnrInput" placeholder="Enter PNR Number">
+    <button onclick="checkStatus()">Check Status</button>
+    <p id="statusResult"></p>
+</div>
+
+<div class="box">
+    <h2>Cancel Ticket</h2>
+
+    <input type="number" id="cancelPnr" placeholder="Enter PNR Number">
+    <button onclick="cancelTicket()">Cancel Ticket</button>
+    <p id="cancelResult"></p>
+</div>
+
+<script>
+    let pnr = 1001;
+    let bookings = {};
+    let selectedFlight = null;
+
+    function searchFlight() {
+        let source = document.getElementById("source").value;
+        let destination = document.getElementById("destination").value;
+        let date = document.getElementById("date").value;
+        let cls = document.getElementById("classType").value;
+
+        if (!source || !destination || !date) {
+            alert("Please enter all flight details");
+            return;
+        }
+
+        if (source.toLowerCase() === destination.toLowerCase()) {
+            alert("Source and destination must be different");
+            return;
+        }
+
+        let fare = cls === "Business" ? 10000 :
+                   cls === "First Class" ? 20000 : 5000;
+
+        selectedFlight = {
+            source: source,
+            destination: destination,
+            date: date,
+            cls: cls,
+            fare: fare
+        };
+
+        document.getElementById("searchResult").innerHTML =
+            "Flight Available!<br>" +
+            "Route: " + source + " to " + destination + "<br>" +
+            "Date: " + date + "<br>" +
+            "Class: " + cls + "<br>" +
+            "Fare: Rs. " + fare;
+    }
+
+    function bookTicket() {
+        let name = document.getElementById("name").value;
+        let age = document.getElementById("age").value;
+
+        if (!selectedFlight) {
+            alert("Please search for a flight first");
+            return;
+        }
+
+        if (!name || !age || Number(age) <= 0) {
+            alert("Enter valid passenger details");
+            return;
+        }
+
+        bookings[pnr] = {
+            name: name,
+            age: age,
+            flight: selectedFlight,
+            status: "Confirmed"
+        };
+
+        document.getElementById("bookingResult").innerHTML =
+            "Ticket Booked Successfully!<br>" +
+            "Passenger: " + name + "<br>" +
+            "PNR Number: " + pnr + "<br>" +
+            "Fare: Rs. " + selectedFlight.fare;
+
+        pnr++;
+    }
+
+    function checkStatus() {
+        let number = document.getElementById("pnrInput").value;
+        let ticket = bookings[number];
+
+        if (ticket) {
+            document.getElementById("statusResult").innerHTML =
+                "Passenger: " + ticket.name + "<br>" +
+                "Route: " + ticket.flight.source + " to " +
+                ticket.flight.destination + "<br>" +
+                "Status: " + ticket.status;
+        } else {
+            document.getElementById("statusResult").innerHTML =
+                "Invalid PNR Number";
+        }
+    }
+
+    function cancelTicket() {
+        let number = document.getElementById("cancelPnr").value;
+        let ticket = bookings[number];
+
+        if (ticket && ticket.status === "Confirmed") {
+            ticket.status = "Cancelled";
+
+            document.getElementById("cancelResult").innerHTML =
+                "Ticket Cancelled Successfully!<br>" +
+                "Refund Amount: Rs. " +
+                (ticket.flight.fare * 0.80);
+        } else {
+            document.getElementById("cancelResult").innerHTML =
+                "Invalid PNR or Ticket Already Cancelled";
+        }
+    }
+</script>
+
+</body>
+</html>
