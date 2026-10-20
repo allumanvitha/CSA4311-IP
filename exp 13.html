@@ -1,0 +1,527 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCare Hospital Appointment System</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #eef7ff;
+        color: #263238;
+    }
+
+    header {
+        background: #087e8b;
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
+
+    nav {
+        background: #07545b;
+        padding: 12px;
+        text-align: center;
+    }
+
+    nav a {
+        color: white;
+        text-decoration: none;
+        margin: 10px;
+    }
+
+    section {
+        padding: 20px;
+    }
+
+    .doctors {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .doctor, .panel {
+        background: white;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        box-shadow: 0 2px 5px #ccd;
+    }
+
+    .doctor {
+        width: 230px;
+    }
+
+    input, select, textarea {
+        display: block;
+        width: 95%;
+        max-width: 450px;
+        padding: 10px;
+        margin: 10px 0;
+        box-sizing: border-box;
+    }
+
+    button {
+        background: #087e8b;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 4px;
+    }
+
+    button:hover {
+        background: #07545b;
+    }
+
+    .status {
+        font-weight: bold;
+        color: #087e8b;
+    }
+
+    iframe {
+        width: 100%;
+        height: 300px;
+        border: 0;
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>MedCare Hospital</h1>
+    <p>Online Doctor Appointment Booking System</p>
+</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#search">Search Doctors</a>
+    <a href="#booking">Book Appointment</a>
+    <a href="#history">My Appointments</a>
+    <a href="#checkin">Check-in</a>
+    <a href="#reviews">Reviews</a>
+    <a href="#admin">Admin</a>
+</nav>
+
+<section id="home">
+    <h2>Welcome to MedCare Hospital</h2>
+    <p>Find doctors, explore specialties, and book appointments online.</p>
+</section>
+
+<section id="search">
+    <h2>Search Hospitals and Doctors</h2>
+
+    <input type="text" id="searchText"
+           placeholder="Search doctor, hospital, or location"
+           oninput="displayDoctors()">
+
+    <select id="specialty" onchange="displayDoctors()">
+        <option value="All">All Specialties</option>
+        <option value="Cardiology">Cardiology</option>
+        <option value="Dermatology">Dermatology</option>
+        <option value="Pediatrics">Pediatrics</option>
+    </select>
+
+    <div class="doctors" id="doctorList"></div>
+</section>
+
+<section id="booking">
+    <h2>Book an Appointment</h2>
+
+    <form onsubmit="bookAppointment(event)">
+        <input id="patientName" placeholder="Patient Name" required>
+        <input id="patientEmail" type="email"
+               placeholder="Email Address" required>
+
+        <select id="doctorSelect" required>
+            <option value="">Select Doctor</option>
+        </select>
+
+        <label>Appointment Date</label>
+        <input id="appointmentDate" type="date" required>
+
+        <label>Appointment Time</label>
+        <select id="appointmentTime" required>
+            <option value="">Select Time</option>
+            <option>09:00 AM</option>
+            <option>10:00 AM</option>
+            <option>11:00 AM</option>
+            <option>02:00 PM</option>
+            <option>03:00 PM</option>
+            <option>04:00 PM</option>
+        </select>
+
+        <button type="submit">Book Appointment</button>
+    </form>
+
+    <div class="panel" id="bookingMessage"></div>
+</section>
+
+<section id="history">
+    <h2>Appointment Management and History</h2>
+    <div class="panel" id="appointmentList">
+        No appointments booked.
+    </div>
+</section>
+
+<section id="checkin">
+    <h2>Patient Check-in Form</h2>
+
+    <form onsubmit="checkIn(event)">
+        <input id="checkinName" placeholder="Patient Name" required>
+        <input id="checkinAppointment" type="number" min="1"
+               placeholder="Appointment ID" required>
+        <textarea id="symptoms"
+                  placeholder="Brief reason for visit"
+                  required></textarea>
+        <button type="submit">Submit Check-in</button>
+    </form>
+
+    <div class="panel" id="checkinMessage"></div>
+</section>
+
+<section id="reviews">
+    <h2>Doctor Rating and Reviews</h2>
+
+    <form onsubmit="submitReview(event)">
+        <input id="reviewer" placeholder="Patient Name" required>
+
+        <select id="reviewDoctor" required>
+            <option value="">Select Doctor</option>
+        </select>
+
+        <select id="rating" required>
+            <option value="">Select Rating</option>
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Very Good</option>
+            <option value="3">3 - Good</option>
+            <option value="2">2 - Fair</option>
+            <option value="1">1 - Poor</option>
+        </select>
+
+        <textarea id="reviewText"
+                  placeholder="Write your review" required></textarea>
+
+        <button type="submit">Submit Review</button>
+    </form>
+
+    <div class="panel" id="reviewList"></div>
+</section>
+
+<section id="admin">
+    <h2>Admin Dashboard</h2>
+    <div class="panel">
+        <p>Total Appointments: <span id="totalAppointments">0</span></p>
+        <p>Booked Appointments: <span id="bookedCount">0</span></p>
+        <p>Cancelled Appointments: <span id="cancelledCount">0</span></p>
+        <p>Total Reviews: <span id="totalReviews">0</span></p>
+    </div>
+
+    <h3>Manage Doctors</h3>
+    <form onsubmit="addDoctor(event)">
+        <input id="newDoctor" placeholder="Doctor Name" required>
+        <input id="newHospital" placeholder="Hospital Name" required>
+        <input id="newLocation" placeholder="Hospital Location" required>
+
+        <select id="newSpecialty" required>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Dermatology">Dermatology</option>
+            <option value="Pediatrics">Pediatrics</option>
+        </select>
+
+        <button type="submit">Add Doctor</button>
+    </form>
+
+    <h3>Hospital Location Map</h3>
+    <p>Example map location: Chennai</p>
+    <iframe
+        title="Map showing Chennai"
+        src="https://maps.google.com/maps?q=Chennai&t=&z=12&ie=UTF8&iwloc=&output=embed"
+        loading="lazy">
+    </iframe>
+</section>
+
+<script>
+const doctors = [
+    {
+        id: 1,
+        name: "Dr. Ravi Kumar",
+        specialty: "Cardiology",
+        hospital: "MedCare Hospital",
+        location: "Chennai"
+    },
+    {
+        id: 2,
+        name: "Dr. Priya Sharma",
+        specialty: "Dermatology",
+        hospital: "City Care Hospital",
+        location: "Coimbatore"
+    },
+    {
+        id: 3,
+        name: "Dr. Arun Raj",
+        specialty: "Pediatrics",
+        hospital: "MedCare Hospital",
+        location: "Chennai"
+    }
+];
+
+let appointments = [];
+let reviews = [];
+let checkins = [];
+let nextId = 1;
+
+const dateInput = document.getElementById("appointmentDate");
+const now = new Date();
+const today = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0")
+].join("-");
+
+dateInput.min = today;
+
+function displayDoctors() {
+    const query = document.getElementById("searchText")
+        .value.toLowerCase();
+    const specialty = document.getElementById("specialty").value;
+
+    const filtered = doctors.filter(d =>
+        (d.name + " " + d.hospital + " " + d.location)
+            .toLowerCase().includes(query) &&
+        (specialty === "All" || d.specialty === specialty)
+    );
+
+    const list = document.getElementById("doctorList");
+    list.replaceChildren();
+
+    if (!filtered.length) {
+        list.textContent = "No matching doctors found.";
+        return;
+    }
+
+    filtered.forEach(d => {
+        const card = document.createElement("div");
+        card.className = "doctor";
+
+        const title = document.createElement("h3");
+        title.textContent = d.name;
+
+        const details = document.createElement("p");
+        details.textContent =
+            d.specialty + " | " + d.hospital + " | " + d.location;
+
+        const button = document.createElement("button");
+        button.textContent = "Select Doctor";
+        button.onclick = () => {
+            document.getElementById("doctorSelect").value = d.id;
+            document.getElementById("booking").scrollIntoView();
+        };
+
+        card.append(title, details, button);
+        list.appendChild(card);
+    });
+}
+
+function populateDoctorOptions() {
+    ["doctorSelect", "reviewDoctor"].forEach(id => {
+        const select = document.getElementById(id);
+        select.replaceChildren();
+
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = "Select Doctor";
+        select.appendChild(placeholder);
+
+        doctors.forEach(d => {
+            const option = document.createElement("option");
+            option.value = d.id;
+            option.textContent = d.name + " - " + d.specialty;
+            select.appendChild(option);
+        });
+    });
+}
+
+function bookAppointment(event) {
+    event.preventDefault();
+
+    const doctorId = Number(
+        document.getElementById("doctorSelect").value);
+    const doctor = doctors.find(d => d.id === doctorId);
+    const date = dateInput.value;
+    const time = document.getElementById("appointmentTime").value;
+
+    if (!doctor || date < today) {
+        alert("Please select a doctor and a valid date.");
+        return;
+    }
+
+    const conflict = appointments.some(a =>
+        a.doctorId === doctorId &&
+        a.date === date &&
+        a.time === time &&
+        a.status === "Booked"
+    );
+
+    if (conflict) {
+        alert("This appointment slot is already booked.");
+        return;
+    }
+
+    const appointment = {
+        id: nextId++,
+        patient: document.getElementById("patientName").value,
+        email: document.getElementById("patientEmail").value,
+        doctorId,
+        doctorName: doctor.name,
+        hospital: doctor.hospital,
+        date,
+        time,
+        status: "Booked"
+    };
+
+    appointments.push(appointment);
+
+    document.getElementById("bookingMessage").textContent =
+        "Appointment booked successfully! Appointment ID: " +
+        appointment.id + ". Doctor: " + doctor.name +
+        ". Date: " + date + ". Time: " + time + ".";
+
+    event.target.reset();
+    renderAppointments();
+}
+
+function renderAppointments() {
+    const list = document.getElementById("appointmentList");
+    list.replaceChildren();
+
+    if (!appointments.length) {
+        list.textContent = "No appointments booked.";
+    }
+
+    appointments.forEach(a => {
+        const item = document.createElement("div");
+        item.className = "panel";
+        item.textContent =
+            "ID: " + a.id + " | Patient: " + a.patient +
+            " | Doctor: " + a.doctorName +
+            " | Date: " + a.date + " | Time: " + a.time +
+            " | Status: " + a.status;
+
+        if (a.status === "Booked") {
+            const cancel = document.createElement("button");
+            cancel.textContent = "Cancel";
+            cancel.onclick = () => {
+                a.status = "Cancelled";
+                renderAppointments();
+            };
+            item.appendChild(cancel);
+        }
+
+        const adminStatus = document.createElement("select");
+        ["Booked", "Completed", "Cancelled"].forEach(status => {
+            const option = document.createElement("option");
+            option.value = status;
+            option.textContent = status;
+            adminStatus.appendChild(option);
+        });
+
+        adminStatus.value = a.status;
+        adminStatus.onchange = () => {
+            a.status = adminStatus.value;
+            renderAppointments();
+        };
+
+        item.appendChild(adminStatus);
+        list.appendChild(item);
+    });
+
+    document.getElementById("totalAppointments").textContent =
+        appointments.length;
+    document.getElementById("bookedCount").textContent =
+        appointments.filter(a => a.status === "Booked").length;
+    document.getElementById("cancelledCount").textContent =
+        appointments.filter(a => a.status === "Cancelled").length;
+}
+
+function checkIn(event) {
+    event.preventDefault();
+
+    const id = Number(
+        document.getElementById("checkinAppointment").value);
+    const appointment = appointments.find(a =>
+        a.id === id && a.status === "Booked");
+
+    if (!appointment) {
+        document.getElementById("checkinMessage").textContent =
+            "No active appointment found for this ID.";
+        return;
+    }
+
+    checkins.push({
+        id,
+        name: document.getElementById("checkinName").value,
+        symptoms: document.getElementById("symptoms").value
+    });
+
+    document.getElementById("checkinMessage").textContent =
+        "Check-in form submitted for appointment #" + id + ".";
+
+    event.target.reset();
+}
+
+function submitReview(event) {
+    event.preventDefault();
+
+    const doctorId = Number(
+        document.getElementById("reviewDoctor").value);
+    const doctor = doctors.find(d => d.id === doctorId);
+
+    if (!doctor) return;
+
+    reviews.push({
+        name: document.getElementById("reviewer").value,
+        doctor: doctor.name,
+        rating: document.getElementById("rating").value,
+        comment: document.getElementById("reviewText").value
+    });
+
+    const item = document.createElement("p");
+    item.textContent = doctor.name + " | Rating: " +
+        reviews[reviews.length - 1].rating + "/5 | " +
+        reviews[reviews.length - 1].comment;
+
+    document.getElementById("reviewList").appendChild(item);
+    document.getElementById("totalReviews").textContent = reviews.length;
+    event.target.reset();
+}
+
+function addDoctor(event) {
+    event.preventDefault();
+
+    doctors.push({
+        id: Math.max(0, ...doctors.map(d => d.id)) + 1,
+        name: document.getElementById("newDoctor").value,
+        hospital: document.getElementById("newHospital").value,
+        location: document.getElementById("newLocation").value,
+        specialty: document.getElementById("newSpecialty").value
+    });
+
+    populateDoctorOptions();
+    displayDoctors();
+    event.target.reset();
+    alert("Doctor added successfully.");
+}
+
+populateDoctorOptions();
+displayDoctors();
+renderAppointments();
+</script>
+
+</body>
+</html>
