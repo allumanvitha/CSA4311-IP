@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Cake Ordering System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #fff4f6;
+            color: #333;
+        }
+        header {
+            background: #d63384;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        nav {
+            background: #84205b;
+            padding: 12px;
+            text-align: center;
+        }
+        nav a {
+            color: white;
+            margin: 12px;
+            text-decoration: none;
+        }
+        section {
+            padding: 20px;
+        }
+        .cakes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .cake {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            width: 220px;
+            text-align: center;
+        }
+        .cake img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        button {
+            background: #d63384;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input, select, textarea {
+            padding: 10px;
+            margin: 5px;
+            max-width: 95%;
+        }
+        .panel {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Buy a Cake</h1>
+    <p>Fresh Cakes for Every Occasion</p>
+</header>
+
+<nav>
+    <a href="#home">Home</a>
+    <a href="#cakes">Cakes</a>
+    <a href="#cart">Cart</a>
+    <a href="#checkout">Order</a>
+    <a href="#admin">Admin</a>
+</nav>
+
+<section id="home">
+    <h2>Welcome to Our Cake Store</h2>
+    <p>Browse delicious cakes and order your favorite cake online.</p>
+</section>
+
+<section id="cakes">
+    <h2>Available Cakes</h2>
+
+    <input type="text" id="search"
+           placeholder="Search cake name..."
+           oninput="displayCakes()">
+
+    <select id="category" onchange="displayCakes()">
+        <option value="All">All Categories</option>
+        <option value="Chocolate">Chocolate</option>
+        <option value="Birthday">Birthday</option>
+        <option value="Fruit">Fruit</option>
+    </select>
+
+    <select id="price" onchange="displayCakes()">
+        <option value="All">All Prices</option>
+        <option value="500">Below ₹500</option>
+        <option value="1000">Below ₹1000</option>
+    </select>
+
+    <div class="cakes" id="cakeList"></div>
+</section>
+
+<section id="cart">
+    <h2>Shopping Cart</h2>
+    <div class="panel" id="cartItems">Your cart is empty.</div>
+    <h3 id="total">Total: ₹0</h3>
+    <button onclick="clearCart()">Clear Cart</button>
+</section>
+
+<section id="checkout">
+    <h2>Customer Details</h2>
+    <form onsubmit="placeOrder(event)">
+        <input id="customer" placeholder="Customer Name" required>
+        <input id="phone" type="tel" placeholder="Phone Number"
+               pattern="[0-9]{10}" required>
+        <br>
+        <textarea id="address" placeholder="Delivery Address"
+                  required></textarea>
+        <br>
+        <label>Delivery Date:</label>
+        <input id="date" type="date" required>
+        <br>
+        <label>Cake Message:</label>
+        <input id="message" placeholder="Happy Birthday!">
+        <br>
+        <button type="submit">Place Order</button>
+    </form>
+    <div class="panel" id="confirmation"></div>
+</section>
+
+<section id="admin">
+    <h2>Admin Panel - Add Cake</h2>
+    <form onsubmit="addCake(event)">
+        <input id="newName" placeholder="Cake Name" required>
+        <select id="newCategory">
+            <option value="Chocolate">Chocolate</option>
+            <option value="Birthday">Birthday</option>
+            <option value="Fruit">Fruit</option>
+        </select>
+        <input id="newPrice" type="number" min="1"
+               placeholder="Price" required>
+        <input id="newDescription" placeholder="Description" required>
+        <button type="submit">Add Cake</button>
+    </form>
+
+    <h3>Order Management</h3>
+    <div class="panel" id="orders">No orders yet.</div>
+</section>
+
+<script>
+    let cakes = [
+        {
+            name: "Chocolate Cake",
+            category: "Chocolate",
+            price: 450,
+            description: "Rich chocolate cream cake",
+            image: "https://placehold.co/300x180?text=Chocolate+Cake"
+        },
+        {
+            name: "Birthday Cake",
+            category: "Birthday",
+            price: 700,
+            description: "Special celebration cake",
+            image: "https://placehold.co/300x180?text=Birthday+Cake"
+        },
+        {
+            name: "Fruit Cake",
+            category: "Fruit",
+            price: 350,
+            description: "Fresh fruit topped cake",
+            image: "https://placehold.co/300x180?text=Fruit+Cake"
+        }
+    ];
+
+    let cart = [];
+    let orders = [];
+
+    function displayCakes() {
+        const search = document.getElementById("search")
+            .value.toLowerCase();
+        const category = document.getElementById("category").value;
+        const price = document.getElementById("price").value;
+
+        const filtered = cakes.filter(cake =>
+            cake.name.toLowerCase().includes(search) &&
+            (category === "All" || cake.category === category) &&
+            (price === "All" || cake.price < Number(price))
+        );
+
+        document.getElementById("cakeList").innerHTML =
+            filtered.map(cake => {
+                const index = cakes.indexOf(cake);
+                return `
+                    <div class="cake">
+                        <img src="${cake.image}"
+                             alt="${cake.name}">
+                        <h3>${cake.name}</h3>
+                        <p>${cake.description}</p>
+                        <p>Category: ${cake.category}</p>
+                        <h3>₹${cake.price}</h3>
+                        <button onclick="addToCart(${index})">
+                            Add to Cart
+                        </button>
+                    </div>`;
+            }).join("") || "<p>No cakes found.</p>";
+    }
+
+    function addToCart(index) {
+        cart.push(cakes[index]);
+        displayCart();
+    }
+
+    function displayCart() {
+        const container = document.getElementById("cartItems");
+
+        container.innerHTML = cart.length
+            ? cart.map((cake, i) =>
+                `${cake.name} - ₹${cake.price}
+                 <button onclick="removeItem(${i})">Remove</button>`
+              ).join("<br>")
+            : "Your cart is empty.";
+
+        const total = cart.reduce((sum, cake) =>
+            sum + cake.price, 0);
+
+        document.getElementById("total").textContent =
+            "Total: ₹" + total;
+    }
+
+    function removeItem(index) {
+        cart.splice(index, 1);
+        displayCart();
+    }
+
+    function clearCart() {
+        cart = [];
+        displayCart();
+    }
+
+    function placeOrder(event) {
+        event.preventDefault();
+
+        if (cart.length === 0) {
+            alert("Please add a cake to the cart first.");
+            return;
+        }
+
+        const customer =
+            document.getElementById("customer").value;
+        const address =
+            document.getElementById("address").value;
+        const date = document.getElementById("date").value;
+        const message =
+            document.getElementById("message").value;
+        const total = cart.reduce((sum, cake) =>
+            sum + cake.price, 0);
+
+        const order = {
+            id: orders.length + 1,
+            customer,
+            address,
+            date,
+            message,
+            total,
+            status: "Order Placed"
+        };
+
+        orders.push(order);
+
+        document.getElementById("confirmation").textContent =
+            `Order #${order.id} confirmed for ${customer}. ` +
+            `Total: ₹${total}. Delivery date: ${date}.`;
+
+        document.getElementById("orders").innerHTML =
+            orders.map(order =>
+                `Order #${order.id} | ${order.customer} | ` +
+                `₹${order.total} | ${order.status}`
+            ).join("<br>");
+
+        cart = [];
+        displayCart();
+        event.target.reset();
+    }
+
+    function addCake(event) {
+        event.preventDefault();
+
+        cakes.push({
+            name: document.getElementById("newName").value,
+            category:
+                document.getElementById("newCategory").value,
+            price: Number(
+                document.getElementById("newPrice").value),
+            description:
+                document.getElementById("newDescription").value,
+            image: "https://placehold.co/300x180?text=New+Cake"
+        });
+
+        displayCakes();
+        event.target.reset();
+        alert("Cake added successfully!");
+    }
+
+    displayCakes();
+</script>
+
+</body>
+</html>
