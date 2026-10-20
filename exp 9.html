@@ -1,0 +1,182 @@
+# Online Railway Reservation System
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Railway Reservation System</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #eaf2f8;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: navy;
+            color: white;
+            padding: 15px;
+        }
+
+        .box {
+            background-color: white;
+            width: 350px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin: 8px;
+        }
+
+        button {
+            background-color: navy;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        #result {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Online Railway Reservation System</h1>
+
+    <div class="box">
+        <h2>Book Your Ticket</h2>
+
+        <input type="text" id="name"
+               placeholder="Passenger Name">
+
+        <input type="text" id="source"
+               placeholder="Source Station">
+
+        <input type="text" id="destination"
+               placeholder="Destination Station">
+
+        <input type="date" id="date">
+
+        <select id="classType">
+            <option value="Sleeper">Sleeper</option>
+            <option value="AC">AC</option>
+            <option value="General">General</option>
+        </select>
+
+        <button onclick="bookTicket()">Book Ticket</button>
+
+        <p id="result"></p>
+    </div>
+
+    <div class="box">
+        <h2>Check PNR Status</h2>
+
+        <input type="number" id="pnrInput"
+               placeholder="Enter PNR Number">
+
+        <button onclick="checkPNR()">Check Status</button>
+
+        <p id="pnrResult"></p>
+    </div>
+
+    <div class="box">
+        <h2>Cancel Ticket</h2>
+
+        <input type="number" id="cancelPNR"
+               placeholder="Enter PNR Number">
+
+        <button onclick="cancelTicket()">Cancel Ticket</button>
+
+        <p id="cancelResult"></p>
+    </div>
+
+    <script>
+        let pnr = 1001;
+        let bookings = {};
+
+        function bookTicket() {
+            let name = document.getElementById("name").value;
+            let source = document.getElementById("source").value;
+            let destination = document.getElementById("destination").value;
+            let date = document.getElementById("date").value;
+            let travelClass = document.getElementById("classType").value;
+
+            if (name === "" || source === "" ||
+                destination === "" || date === "") {
+                alert("Please fill all the details");
+                return;
+            }
+
+            let fare = travelClass === "AC" ? 800 :
+                       travelClass === "Sleeper" ? 400 : 150;
+
+            bookings[pnr] = {
+                name: name,
+                source: source,
+                destination: destination,
+                date: date,
+                travelClass: travelClass,
+                fare: fare,
+                status: "Confirmed"
+            };
+
+            document.getElementById("result").innerHTML =
+                "Ticket Booked Successfully!<br>" +
+                "Passenger: " + name + "<br>" +
+                "Route: " + source + " to " + destination + "<br>" +
+                "Journey Date: " + date + "<br>" +
+                "Class: " + travelClass + "<br>" +
+                "Fare: Rs. " + fare + "<br>" +
+                "PNR Number: " + pnr;
+
+            pnr++;
+        }
+
+        function checkPNR() {
+            let number = document.getElementById("pnrInput").value;
+            let booking = bookings[number];
+
+            if (booking) {
+                document.getElementById("pnrResult").innerHTML =
+                    "Passenger: " + booking.name + "<br>" +
+                    "Train Route: " + booking.source + " to " +
+                    booking.destination + "<br>" +
+                    "Status: " + booking.status;
+            } else {
+                document.getElementById("pnrResult").innerHTML =
+                    "Invalid PNR Number";
+            }
+        }
+
+        function cancelTicket() {
+            let number = document.getElementById("cancelPNR").value;
+            let booking = bookings[number];
+
+            if (booking && booking.status === "Confirmed") {
+                booking.status = "Cancelled";
+
+                let refund = booking.fare * 0.80;
+
+                document.getElementById("cancelResult").innerHTML =
+                    "Ticket Cancelled Successfully!<br>" +
+                    "PNR: " + number + "<br>" +
+                    "Refund Amount: Rs. " + refund;
+            } else {
+                document.getElementById("cancelResult").innerHTML =
+                    "Invalid PNR or Ticket Already Cancelled";
+            }
+        }
+    </script>
+
+</body>
+</html>
+```
+
